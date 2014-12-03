@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package projecto_bd;
 
 import java.sql.Connection;
@@ -25,7 +26,7 @@ public class Projecto_BD {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost/projecto" + "user=root");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + "user=root");
             System.out.println("Connected.\n");
             
             stmt =conn.createStatement();
