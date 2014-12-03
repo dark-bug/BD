@@ -9,8 +9,8 @@ USE `mydb` ;
 -- Table `mydb`.`User`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`User` (
-  `idUser` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL,
+  `idUser` INT NOT NULL,
+  `nome` VARCHAR(45) NULL,
   `username` VARCHAR(45) NULL,
   `job` VARCHAR(45) NULL,
   `pass` VARCHAR(45) NULL,
@@ -22,93 +22,18 @@ ENGINE = InnoDB;
 -- Table `mydb`.`Meeting`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`Meeting` (
+  `idMeeting` INT NOT NULL,
+  `desiredOutcome` VARCHAR(350) NULL,
   `title` VARCHAR(45) NULL,
-  `desiredOutcome` VARCHAR(45) NULL,
   `date` TIMESTAMP NULL,
   `location` VARCHAR(45) NULL,
-  `idMeeting` INT NOT NULL,
-  PRIMARY KEY (`idMeeting`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Discussion`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Discussion` (
-  `idAItem` INT NOT NULL)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`ActionItem`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`ActionItem` (
-  `nome` VARCHAR(45) NULL,
-  `done` TINYINT(1) NULL,
+  `active` TINYINT(1) NULL,
   `User_idUser` INT NOT NULL,
-  `Meeting_User_idUser` INT NOT NULL,
-  CONSTRAINT `fk_ActionItem_User1`
+  PRIMARY KEY (`idMeeting`),
+  INDEX `fk_Meeting_User_idx` (`User_idUser` ASC),
+  CONSTRAINT `fk_Meeting_User`
     FOREIGN KEY (`User_idUser`)
     REFERENCES `mydb`.`User` (`idUser`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`KeyDecision`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`KeyDecision` (
-  `idItem` INT NOT NULL)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Group`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Group` (
-  `idGroup` INT NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`idGroup`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`ActionItem`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`ActionItem` (
-  `nome` VARCHAR(45) NULL,
-  `done` TINYINT(1) NULL,
-  `User_idUser` INT NOT NULL,
-  `Meeting_User_idUser` INT NOT NULL,
-  CONSTRAINT `fk_ActionItem_User1`
-    FOREIGN KEY (`User_idUser`)
-    REFERENCES `mydb`.`User` (`idUser`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Agenda Item`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Agenda Item` (
-  `idAItem` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) NULL,
-  `Meeting_User_idUser` INT NOT NULL,
-  `KeyDecision_idItem` INT NOT NULL,
-  `discussion` MEDIUMTEXT NULL,
-  `Discussion_idAItem` INT NOT NULL,
-  PRIMARY KEY (`idAItem`),
-  INDEX `fk_Agenda Item_KeyDecision1_idx` (`KeyDecision_idItem` ASC),
-  INDEX `fk_Agenda Item_Discussion1_idx` (`Discussion_idAItem` ASC),
-  CONSTRAINT `fk_Agenda Item_KeyDecision1`
-    FOREIGN KEY (`KeyDecision_idItem`)
-    REFERENCES `mydb`.`KeyDecision` (`idItem`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Agenda Item_Discussion1`
-    FOREIGN KEY (`Discussion_idAItem`)
-    REFERENCES `mydb`.`Discussion` (`idAItem`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -121,69 +46,155 @@ CREATE TABLE IF NOT EXISTS `mydb`.`User_has_Meeting` (
   `User_idUser` INT NOT NULL,
   `Meeting_idMeeting` INT NOT NULL,
   PRIMARY KEY (`User_idUser`, `Meeting_idMeeting`),
+  INDEX `fk_User_has_Meeting_Meeting1_idx` (`Meeting_idMeeting` ASC),
   INDEX `fk_User_has_Meeting_User1_idx` (`User_idUser` ASC),
   CONSTRAINT `fk_User_has_Meeting_User1`
     FOREIGN KEY (`User_idUser`)
     REFERENCES `mydb`.`User` (`idUser`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`User_has_Meeting1`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`User_has_Meeting1` (
-  `User_idUser` INT NOT NULL,
-  `Meeting_User_idUser` INT NOT NULL,
-  PRIMARY KEY (`User_idUser`, `Meeting_User_idUser`),
-  INDEX `fk_User_has_Meeting1_User1_idx` (`User_idUser` ASC),
-  CONSTRAINT `fk_User_has_Meeting1_User1`
-    FOREIGN KEY (`User_idUser`)
-    REFERENCES `mydb`.`User` (`idUser`)
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_User_has_Meeting_Meeting1`
+    FOREIGN KEY (`Meeting_idMeeting`)
+    REFERENCES `mydb`.`Meeting` (`idMeeting`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`Group_has_User`
+-- Table `mydb`.`Item`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Group_has_User` (
-  `Group_idGroup` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `mydb`.`Item` (
+  `idItem` INT NOT NULL,
+  `description` VARCHAR(100) NULL,
+  `idMeeting` INT NOT NULL,
+  PRIMARY KEY (`idItem`),
+  INDEX `fk_Item_Meeting1_idx` (`idMeeting` ASC),
+  CONSTRAINT `fk_Item_Meeting1`
+    FOREIGN KEY (`idMeeting`)
+    REFERENCES `mydb`.`Meeting` (`idMeeting`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ActionItem`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`ActionItem` (
+  `idActionItem` INT NOT NULL,
+  `description` VARCHAR(100) NULL,
+  `done` TINYINT(1) NULL,
   `User_idUser` INT NOT NULL,
-  INDEX `fk_Group_has_User_User1_idx` (`User_idUser` ASC),
-  INDEX `fk_Group_has_User_Group1_idx` (`Group_idGroup` ASC),
-  CONSTRAINT `fk_Group_has_User_Group1`
+  `Meeting_idMeeting` INT NOT NULL,
+  PRIMARY KEY (`idActionItem`),
+  INDEX `fk_ActionItem_User1_idx` (`User_idUser` ASC),
+  INDEX `fk_ActionItem_Meeting1_idx` (`Meeting_idMeeting` ASC),
+  CONSTRAINT `fk_ActionItem_User1`
+    FOREIGN KEY (`User_idUser`)
+    REFERENCES `mydb`.`User` (`idUser`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ActionItem_Meeting1`
+    FOREIGN KEY (`Meeting_idMeeting`)
+    REFERENCES `mydb`.`Meeting` (`idMeeting`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Group`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Group` (
+  `idGroup` INT NOT NULL,
+  `description` VARCHAR(45) NULL,
+  PRIMARY KEY (`idGroup`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`User_has_Group`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`User_has_Group` (
+  `User_idUser` INT NOT NULL,
+  `Group_idGroup` INT NOT NULL,
+  PRIMARY KEY (`User_idUser`, `Group_idGroup`),
+  INDEX `fk_User_has_Group_Group1_idx` (`Group_idGroup` ASC),
+  INDEX `fk_User_has_Group_User1_idx` (`User_idUser` ASC),
+  CONSTRAINT `fk_User_has_Group_User1`
+    FOREIGN KEY (`User_idUser`)
+    REFERENCES `mydb`.`User` (`idUser`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_User_has_Group_Group1`
+    FOREIGN KEY (`Group_idGroup`)
+    REFERENCES `mydb`.`Group` (`idGroup`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Group_has_Meeting`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Group_has_Meeting` (
+  `Group_idGroup` INT NOT NULL,
+  `Meeting_idMeeting` INT NOT NULL,
+  PRIMARY KEY (`Group_idGroup`, `Meeting_idMeeting`),
+  INDEX `fk_Group_has_Meeting_Meeting1_idx` (`Meeting_idMeeting` ASC),
+  INDEX `fk_Group_has_Meeting_Group1_idx` (`Group_idGroup` ASC),
+  CONSTRAINT `fk_Group_has_Meeting_Group1`
     FOREIGN KEY (`Group_idGroup`)
     REFERENCES `mydb`.`Group` (`idGroup`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Group_has_User_User1`
-    FOREIGN KEY (`User_idUser`)
-    REFERENCES `mydb`.`User` (`idUser`)
+  CONSTRAINT `fk_Group_has_Meeting_Meeting1`
+    FOREIGN KEY (`Meeting_idMeeting`)
+    REFERENCES `mydb`.`Meeting` (`idMeeting`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`User_has_Meeting2`
+-- Table `mydb`.`KeyDecision`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`User_has_Meeting2` (
-  `User_idUser` INT NULL,
-  `Meeting_idMeeting` INT NULL,
-  `leader` INT NULL,
-  INDEX `fk_User_has_Meeting2_Meeting1_idx` (`Meeting_idMeeting` ASC),
-  INDEX `fk_User_has_Meeting2_User1_idx` (`User_idUser` ASC),
-  CONSTRAINT `fk_User_has_Meeting2_User1`
-    FOREIGN KEY (`User_idUser`)
-    REFERENCES `mydb`.`User` (`idUser`)
+CREATE TABLE IF NOT EXISTS `mydb`.`KeyDecision` (
+  `idKeyDecision` INT NOT NULL,
+  `description` VARCHAR(45) NULL,
+  `finished` TINYINT(1) NULL,
+  `idItem` INT NOT NULL,
+  PRIMARY KEY (`idKeyDecision`),
+  INDEX `fk_KeyDecision_Item1_idx` (`idItem` ASC),
+  CONSTRAINT `fk_KeyDecision_Item1`
+    FOREIGN KEY (`idItem`)
+    REFERENCES `mydb`.`Item` (`idItem`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Discussion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Discussion` (
+  `idDiscussion` INT NOT NULL,
+  `content` VARCHAR(500) NULL,
+  `active` TINYINT(1) NULL,
+  `Item_idItem` INT NOT NULL,
+  `User_idUser` INT NOT NULL,
+  PRIMARY KEY (`idDiscussion`),
+  INDEX `fk_Discussion_Item1_idx` (`Item_idItem` ASC),
+  INDEX `fk_Discussion_User1_idx` (`User_idUser` ASC),
+  CONSTRAINT `fk_Discussion_Item1`
+    FOREIGN KEY (`Item_idItem`)
+    REFERENCES `mydb`.`Item` (`idItem`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_User_has_Meeting2_Meeting1`
-    FOREIGN KEY (`Meeting_idMeeting`)
-    REFERENCES `mydb`.`Meeting` (`idMeeting`)
+  CONSTRAINT `fk_Discussion_User1`
+    FOREIGN KEY (`User_idUser`)
+    REFERENCES `mydb`.`User` (`idUser`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
