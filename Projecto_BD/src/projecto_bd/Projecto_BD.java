@@ -3,13 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package projecto_bd;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  *
@@ -18,40 +14,20 @@ import java.sql.Statement;
 public class Projecto_BD {
 
     public static void main(String[] args) {
-        String nome = "daniel";
-        String pass = "1111";
-        String job = "dasd";
-        Connection conn = null;
-        Statement stmt = null;
+        String url = "jdbc:mysql://localhost:3306/";
+        String dbName = "newdatabase";
+        String driver = "com.mysql.jdbc.Driver";
+        String userName = "root";
+       
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + "user=root");
-            System.out.println("Connected.\n");
-            
-            stmt =conn.createStatement();
-            String cmd = "INSERT INTO User" + "VALUES (1,'DANIEL','a','B','ffff')";
-            
-            stmt.executeUpdate(cmd);
-        } catch (Exception e) {
+             Class.forName(driver).newInstance();
+             Connection conn = DriverManager.getConnection(url+dbName,userName,"");
+             
+             conn.close();
+        }catch(Exception e){
             e.printStackTrace();
-        } finally {
-            try {
-                if (stmt != null) {
-                    conn.close();
-                }
-            } catch (SQLException se) {
-            }
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
         }
+
     }
-
-    
-
 }
