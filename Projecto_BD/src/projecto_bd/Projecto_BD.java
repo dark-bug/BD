@@ -35,8 +35,8 @@ public class Projecto_BD {
             System.out.println(n_users);
             //printInfo();
             conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException e) {
+            System.out.println("Catch exception: "+e);
         }
 
     }
